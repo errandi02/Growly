@@ -115,6 +115,7 @@ export default function Messages() {
           isFirstInGroup: false,
           isLastInGroup: false,
         }));
+        
         if (!mounted) return;
         setMessages(processMessages(fetched));
         console.log(messages)
@@ -124,7 +125,7 @@ export default function Messages() {
       }
     };
     fetchMessages();
-    const interval = setInterval(fetchMessages, 5000);
+    const interval = setInterval(fetchMessages, 2000);
     return () => {
       mounted = false;
       clearInterval(interval);
@@ -137,6 +138,41 @@ export default function Messages() {
   }, [messages]);
 
   // Enviar nuevo mensaje
+  // Extrae fetchMessages fuera del useEffect para poder reutilizarla
+  const fetchMessages = async () => {
+    try {
+      const res = await axios.get<Message[]>(
+        `http://localhost:8080/messages/${idUserSender}/${idUsuario}`
+      );
+      const fetched = res.data.map(m => ({
+        id: m.id,
+        sender_id: m.sender_id,
+        content: m.content,
+        created_at: new Date((m as any).created_at),
+        status: (m as any).read_at ? 'read' : 'delivered',
+        isFirstInGroup: false,
+        isLastInGroup: false,
+      }));
+      setMessages(processMessages(fetched));
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+    }
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    fetchMessages();
+    const interval = setInterval(() => {
+      if (mounted) fetchMessages();
+    }, 500);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     const content = newMessage.trim();
@@ -157,7 +193,7 @@ export default function Messages() {
         created_at: new Date(created.created_at)
       };
       setMessages(prev => processMessages([...prev, newMsg]));
-      //window.location.reload();
+      await fetchMessages(); // Llama a fetchMessages después de enviar
     } catch (err) {
       console.error('Error sending message:', err);
     }
