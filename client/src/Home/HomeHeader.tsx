@@ -89,7 +89,7 @@ export default function LinkedInHeader() {
    }
  
   return (
-  <header   className="sticky top-0 z-[9999] w-full border-b"
+  <header   className="sticky top-0 z-[9990] w-full border-b"
   style={{ backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' }}  >
       <div className="flex h-18 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-4 ml-20">
@@ -167,7 +167,7 @@ export default function LinkedInHeader() {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" style={{ backgroundColor : '#white' , borderColor: '#black'}}>
+      <DropdownMenuContent className="w-56 z-[9991]" style={{ backgroundColor : '#white' , borderColor: '#black'}}>
         <DropdownMenuLabel>{name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
